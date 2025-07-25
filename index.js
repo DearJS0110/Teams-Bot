@@ -33,7 +33,7 @@ server.post('/api/messages', async (req, res) => {
         }
 
         const result = await response.json();
-        await context.sendActivity(result.reply || 'Đã nhận tin nhắn!');
+        await context.sendActivity(result.output || 'Đã nhận tin nhắn!');
       } catch (error) {
         console.error('Error calling n8n webhook:', error);
         await context.sendActivity('Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn.');
