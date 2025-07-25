@@ -39,9 +39,15 @@ server.post('/api/messages', async (req, res) => {
         const result = await response.json();
         console.log('Response from n8n:', result);
 
-        // Dùng result.reply hoặc result.output tuỳ cấu hình n8n trả về
-        const replyText = result.reply || result.output || 'Đã nhận tin nhắn!';
-        await context.sendActivity(replyText);
+        // Chuẩn bị nội dung reply với HTML để Teams hiểu xuống dòng
+        const replyText = (result.reply || result.output || 'Đã nhận tin nhắn!').replace(/\n/g, '<br>');
+
+        // Gửi message dạng HTML để hiển thị xuống dòng
+        await context.sendActivity({
+          type: 'message',
+          textFormat: 'xml',  // hoặc 'html' cũng được
+          text: replyText,
+        });
       } catch (error) {
         console.error('Error calling n8n webhook:', error);
         await context.sendActivity('Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn.');
