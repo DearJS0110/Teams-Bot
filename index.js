@@ -18,12 +18,14 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 server.post('/api/messages', async (req, res) => {
-  adapter.processActivity(req, res, async (context) => {
+  // Đợi processActivity hoàn thành mới trả về response HTTP
+  await adapter.processActivity(req, res, async (context) => {
     if (context.activity.type === 'message') {
       const userMessage = context.activity.text;
+      console.log('Received message:', userMessage);
 
       try {
-        // Gọi webhook n8n chờ kết quả trả về
+        console.log('Calling n8n webhook...');
         const response = await fetch(process.env.N8N_WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -34,11 +36,12 @@ server.post('/api/messages', async (req, res) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Đảm bảo parse JSON đúng format, ví dụ { reply: "text trả về" }
         const result = await response.json();
+        console.log('Response from n8n:', result);
 
-        // Gửi phản hồi tới Teams đúng nội dung n8n trả về
-        await context.sendActivity(result.output || 'Đã nhận tin nhắn!');
+        // Dùng result.reply hoặc result.output tuỳ cấu hình n8n trả về
+        const replyText = result.reply || result.output || 'Đã nhận tin nhắn!';
+        await context.sendActivity(replyText);
       } catch (error) {
         console.error('Error calling n8n webhook:', error);
         await context.sendActivity('Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn.');
