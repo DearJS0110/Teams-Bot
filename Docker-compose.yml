@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  teams-bot:
+    image: teams-bot-image
+    container_name: teams-bot-container
+    ports:
+      - "3978:3978"
+    restart: unless-stopped
+    # volumes:   # Nếu không cần mount thư mục code, comment hoặc xóa phần này đi
+    #   - ./some_local_folder:/app
+    env_file:
+      - ./.env

@@ -1,0 +1,5 @@
+# Tự động xử lý dòng kết thúc cho tất cả file text
+* text=auto
+
+# Bắt buộc file JSON dùng LF (dòng kết thúc chuẩn Linux/macOS)
+*.json text eol=lf
